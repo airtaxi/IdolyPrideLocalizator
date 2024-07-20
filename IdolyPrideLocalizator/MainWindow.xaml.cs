@@ -8,8 +8,9 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-
-        ExtendsContentIntoTitleBar = true;
+        AppWindow.SetIcon("Icon.ico");
         SystemBackdrop = new MicaBackdrop();
+        ExtendsContentIntoTitleBar = true;
+        SetTitleBar(TitleBar);
     }
 }

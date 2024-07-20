@@ -12,6 +12,7 @@
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 		<WindowsPackageType>None</WindowsPackageType>
 		<EnableMsixTooling>true</EnableMsixTooling>
+		<Version>1.0.0.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

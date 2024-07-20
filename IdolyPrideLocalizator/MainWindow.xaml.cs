@@ -124,6 +124,11 @@ public sealed partial class MainWindow : Window
                 changedLine = changedLine.Replace(viewModel.OriginalName, viewModel.TranslatedName);
                 newMessageLines.Add($"[message text={viewModel.TranslatedText} name={viewModel.TranslatedName}]");
             }
+            else if(changedLine.StartsWith("[title title="))
+            {
+                changedLine = $"[title title={TbxTranslatedTitle.Text.Trim()}]";
+                newMessageLines.Add(changedLine);
+            }
             newLines.Add(changedLine);
         }
 

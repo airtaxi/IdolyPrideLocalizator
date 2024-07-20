@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "IdolyPrideLocalizator (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "IdolyPrideLocalizator (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

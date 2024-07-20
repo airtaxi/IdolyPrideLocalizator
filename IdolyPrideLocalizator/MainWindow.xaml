@@ -6,13 +6,57 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:IdolyPrideLocalizator"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:IdolyPrideLocalizator.ViewModels"
     Title="Idoly Pride Localizator"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="48" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Grid.Resources>
+            <XamlUICommand
+                x:Key="OpenCommand"
+                ExecuteRequested="OnOpenRequested"
+                Label="Open">
+                <XamlUICommand.IconSource>
+                    <SymbolIconSource Symbol="Folder" />
+                </XamlUICommand.IconSource>
+                <XamlUICommand.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="O" Modifiers="Control" />
+                </XamlUICommand.KeyboardAccelerators>
+            </XamlUICommand>
+            <XamlUICommand
+                x:Key="SaveAsCommand"
+                ExecuteRequested="OnSaveRequested"
+                Label="Save As">
+                <XamlUICommand.IconSource>
+                    <SymbolIconSource Symbol="Save" />
+                </XamlUICommand.IconSource>
+                <XamlUICommand.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="S" Modifiers="Control" />
+                </XamlUICommand.KeyboardAccelerators>
+            </XamlUICommand>
+            <XamlUICommand
+                x:Key="ExitCommand"
+                ExecuteRequested="OnExitRequested"
+                Label="Exit">
+                <XamlUICommand.IconSource>
+                    <SymbolIconSource Symbol="Cancel" />
+                </XamlUICommand.IconSource>
+            </XamlUICommand>
+            <XamlUICommand
+                x:Key="ReplaceCommand"
+                ExecuteRequested="OnReplaceRequested"
+                Label="Replace All">
+                <XamlUICommand.IconSource>
+                    <SymbolIconSource Symbol="Rename" />
+                </XamlUICommand.IconSource>
+                <XamlUICommand.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="H" Modifiers="Control" />
+                </XamlUICommand.KeyboardAccelerators>
+            </XamlUICommand>
+        </Grid.Resources>
 
         <TitleBar
             x:Name="TitleBar"
@@ -24,10 +68,13 @@
             </TitleBar.IconSource>
 
             <TextBox
+                x:Name="TbxSearch"
                 Grid.Column="2"
                 Width="300"
                 VerticalAlignment="Center"
-                PlaceholderText="Search script..." />
+                IsEnabled="False"
+                PlaceholderText="Search script..." 
+                TextChanged="OnSearchTextBoxTextChanged"/>
         </TitleBar>
 
         <Grid Grid.Row="1" Background="{ThemeResource LayerOnMicaBaseAltFillColorDefault}">
@@ -35,6 +82,108 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+            <MenuBar Grid.Row="0">
+                <MenuBarItem
+                    Title="File"
+                    AccessKey="F"
+                    IsAccessKeyScope="True">
+                    <MenuFlyoutItem AccessKey="O" Command="{StaticResource OpenCommand}" />
+                    <MenuFlyoutItem
+                        x:Name="MfiSave"
+                        AccessKey="S"
+                        Command="{StaticResource SaveAsCommand}"
+                        IsEnabled="False" />
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem AccessKey="X" Command="{StaticResource ExitCommand}" />
+                </MenuBarItem>
+                <MenuBarItem
+                    Title="Edit"
+                    AccessKey="E"
+                    IsAccessKeyScope="True">
+                    <MenuFlyoutItem
+                        x:Name="MfiReplaceAll"
+                        AccessKey="R"
+                        Command="{StaticResource ReplaceCommand}"
+                        IsEnabled="False" />
+                </MenuBarItem>
+            </MenuBar>
+            <Frame
+                x:Name="FrMain"
+                Grid.Row="1"
+                Padding="10"
+                Background="{ThemeResource LayerOnMicaBaseAltFillColorSecondary}"
+                IsEnabled="False">
+                <Grid RowSpacing="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            x:Name="TbxTitle"
+                            Grid.Column="0"
+                            Header="Title"
+                            IsEnabled="False" />
+                        <TextBox
+                            x:Name="TbxTranslatedTitle"
+                            Grid.Column="1"
+                            Header="Translated Title" />
+                    </Grid>
+                    <ScrollViewer
+                        Grid.Row="1"
+                        Background="{ThemeResource LayerOnMicaBaseAltFillColorTertiary}"
+                        CornerRadius="10">
+                        <ItemsRepeater x:Name="IrMain">
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MessageViewModel">
+                                    <Grid
+                                        Padding="10"
+                                        ColumnSpacing="5"
+                                        RowSpacing="5">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="150" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox
+                                            Grid.Row="0"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Stretch"
+                                            IsEnabled="False"
+                                            Text="{x:Bind OriginalText, Mode=OneWay}" />
+
+                                        <TextBox
+                                            Grid.Row="0"
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            IsEnabled="False"
+                                            Text="{x:Bind OriginalName, Mode=OneWay}" />
+
+                                        <TextBox
+                                            Grid.Row="1"
+                                            Grid.Column="0"
+                                            HorizontalAlignment="Stretch"
+                                            Text="{x:Bind TranslatedText, Mode=TwoWay}" />
+
+                                        <TextBox
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            Text="{x:Bind TranslatedName, Mode=TwoWay}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </ScrollViewer>
+                </Grid>
+            </Frame>
         </Grid>
     </Grid>
 </Window>

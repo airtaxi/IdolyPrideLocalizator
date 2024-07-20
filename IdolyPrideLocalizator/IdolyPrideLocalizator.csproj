@@ -16,8 +16,12 @@
 		<ApplicationIcon>Icon.ico</ApplicationIcon>
 		<Version>1.0.0.0</Version>
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Remove="ContentDialogs\ReplaceContentDialog.xaml" />
+	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
 		<PackageReference Include="DetoursCustomDPI" Version="1.0.3" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.240701003-experimental2" />
@@ -36,6 +40,9 @@
 	  <Folder Include="Assets\" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Page Update="ContentDialogs\ReplaceContentDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <None Update="Icon.ico">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

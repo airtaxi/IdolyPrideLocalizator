@@ -1,0 +1,23 @@
+﻿<ContentDialog
+    x:Class="IdolyPrideLocalizator.ContentDialogs.ReplaceContentDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:IdolyPrideLocalizator.ContentDialogs"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Replace All"
+    PrimaryButtonClick="OnReplaceAllButtonClicked"
+    PrimaryButtonText="Replace All"
+    SecondaryButtonClick="OnCancelButtonClicked"
+    SecondaryButtonText="Cancel"
+    Style="{ThemeResource DefaultContentDialogStyle}">
+    <StackPanel Spacing="15">
+        <TextBox
+            x:Name="TbxFind"
+            Header="Text to find"
+            PlaceholderText="Find" />
+        <TextBox
+            x:Name="TbxReplace"
+            Header="Replace with"
+            PlaceholderText="Replace" />
+    </StackPanel>
+</ContentDialog>

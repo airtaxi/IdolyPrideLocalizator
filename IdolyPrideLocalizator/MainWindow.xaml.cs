@@ -8,8 +8,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 using Windows.Storage.Pickers;
 
 namespace IdolyPrideLocalizator;
@@ -31,9 +35,9 @@ public sealed partial class MainWindow : Window
 
     private async void OnOpenRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
     {
-        if(_currentFileContent != null)
+        if (_currentFileContent != null)
         {
-            var dialog = Content.GenerateMessageDialog("Warning", "You have unsaved changes. Do you want to continue?", "Yes", "No");
+            var dialog = Content.GenerateMessageDialog("Warning", "You have unsaved changes.\nDo you want to continue?", "Yes", "No");
             var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Secondary) return;
         }
@@ -50,16 +54,21 @@ public sealed partial class MainWindow : Window
         var file = await fileOpenPicker.PickSingleFileAsync();
         if (file == null) return;
 
+        await OpenFileAsync(file.Path);
+    }
+
+    private async Task OpenFileAsync(string filePath)
+    {
         _viewModels.Clear();
 
-        var content = File.ReadAllText(file.Path);
-        if(!content.Contains("\n[title title="))
+        var content = File.ReadAllText(filePath);
+        if (!content.Contains("\n[title title="))
         {
             await Content.ShowMessageDialogAsync("Error", "File format error!");
             return;
         }
 
-        var fileName = Path.GetFileNameWithoutExtension(file.Path);
+        var fileName = Path.GetFileNameWithoutExtension(filePath);
         TitleBar.Subtitle = fileName;
 
 
@@ -70,9 +79,9 @@ public sealed partial class MainWindow : Window
 
         // Message Example: 
         // [message text= 本戦は、十六グループによるトーナメント形式によって name = 司会者 thumbnial = img_mob_adv_host_host - 00 clip =\{ "_startTime":0.8,"_duration":3.7333333333333336,"_easeInDuration":0.0,"_easeOutDuration":0.0,"_blendInDuration":-1.0,"_blendOutDuration":-1.0,"_mixInEaseType":1,"_mixOutEaseType":1,"_timeScale":1.0\}]
-        foreach(var line in lines)
+        foreach (var line in lines)
         {
-            if(line.StartsWith("[message text="))
+            if (line.StartsWith("[message text="))
             {
                 var message = new MessageViewModel();
                 var text = line.Replace("[message text=", string.Empty).Split(" name=")[0];
@@ -165,5 +174,57 @@ public sealed partial class MainWindow : Window
         else IrMain.ItemsSource = _viewModels.Where(x => x.OriginalText.Contains(textBox.Text, 
             StringComparison.OrdinalIgnoreCase) || x.OriginalName.Contains(textBox.Text, StringComparison.OrdinalIgnoreCase)
             || x.TranslatedText.Contains(textBox.Text, StringComparison.OrdinalIgnoreCase) || x.TranslatedName.Contains(textBox.Text, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void OnDragOver(object sender, DragEventArgs e)
+    {
+        e.AcceptedOperation = DataPackageOperation.Copy;
+    }
+
+    private async void OnDrop(object sender, DragEventArgs e)
+    {
+        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        {
+            var items = await e.DataView.GetStorageItemsAsync();
+            if (items.Count == 1)
+            {
+                var item = items.First();
+                if (_currentFileContent != null)
+                {
+                    var dialog = Content.GenerateMessageDialog("Warning", "You have unsaved changes.\nDo you want to continue?", "Yes", "No");
+                    var result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Secondary) return;
+                }
+
+                var filePath = item.Path;
+                var extension = Path.GetExtension(filePath);
+                if (extension != ".txt")
+                {
+                    await Content.ShowMessageDialogAsync("Error", "File format error!");
+                    return;
+                }
+
+                await OpenFileAsync(filePath);
+            }
+            else
+            {
+                await Content.ShowMessageDialogAsync("Error", "Please drop only one file!");
+                return;
+            }
+        }
+    }
+
+    private async void OnClosed(object sender, WindowEventArgs args)
+    {
+        args.Handled = true;
+
+        if (_currentFileContent != null)
+        {
+            var dialog = Content.GenerateMessageDialog("Warning", "You have unsaved changes.\nDo you want to continue?", "Yes", "No");
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Secondary) return;
+        }
+
+        Environment.Exit(0);
     }
 }
